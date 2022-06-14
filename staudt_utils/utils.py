@@ -57,7 +57,13 @@ def mprint(x, d=3, show=True):
     if not isinstance(x,u.quantity.Quantity):
         x = u.quantity.Quantity(x)
     v=x.value
+
     exp = int(floor(np.log10((abs(v)))))
+    if exp != 0:
+        order_string = '\\times10^{{{0:d}}}'.format(exp)
+    else:
+        order_string = ''
+
     fac = v/10.**exp
     unit_string = '{0:latex}'.format(x.unit)
 
@@ -65,11 +71,15 @@ def mprint(x, d=3, show=True):
     #string
     unit_string = unit_string.replace('$','') 
     
-    if unit_string!='':
+    #if x is not unitless, add a space before the unit, otherwise just get rid
+    #of the string
+    if unit_string!='\mathrm{}': 
         unit_string = '\ '+unit_string
+    else:
+        unit_string = ''
 
-    string = '${0:0.{3}f}\\times10^{{{2}}}{1:s}$'.format(fac, unit_string, 
-                                                           exp, d)
+    string = '${0:0.{3}f}{2:s}{1:s}$'.format(fac, unit_string, 
+                                             order_string, d)
     if show:
         display(Latex(string))
     return string 
