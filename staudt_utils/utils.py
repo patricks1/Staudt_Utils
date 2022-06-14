@@ -64,8 +64,11 @@ def mprint(x, d=3, show=True):
     #replace '$' so unit_string can be easily incorporated into the larger 
     #string
     unit_string = unit_string.replace('$','') 
+    
+    if unit_string!='':
+        unit_string = '\ '+unit_string
 
-    string = '${0:0.{3}f}\\times10^{{{2}}}\ {1:s}$'.format(fac, unit_string, 
+    string = '${0:0.{3}f}\\times10^{{{2}}}{1:s}$'.format(fac, unit_string, 
                                                            exp, d)
     if show:
         display(Latex(string))
