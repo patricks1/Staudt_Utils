@@ -54,10 +54,19 @@ def lookup(lookupval,lookuparray,resultarray,threshold):
     return result
 
 def mprint(x, d=3, show=True):
+    if not isinstance(x,u.quantity.Quantity):
+        x = u.quantity.Quantity(x)
     v=x.value
     exp = int(floor(np.log10((abs(v)))))
     fac = v/10.**exp
-    string = '${0:0.{3}f}\\times10^{{{2}}}$ {1:latex}'.format(fac, x.unit, exp, d)
+    unit_string = '{0:latex}'.format(x.unit)
+
+    #replace '$' so unit_string can be easily incorporated into the larger 
+    #string
+    unit_string = unit_string.replace('$','') 
+
+    string = '${0:0.{3}f}\\times10^{{{2}}}\ {1:s}$'.format(fac, unit_string, 
+                                                           exp, d)
     if show:
         display(Latex(string))
     return string 
@@ -97,3 +106,7 @@ def print_eq(lhs, x, d=3, op='='):
         string = '${0:0.{3}f}$ {1:{4}}'.format(fac, unit, exp, d, fmt)
     display(Latex('$'+lhs+op+'\:$'+string))
     return None 
+
+if __name__=='__main__':
+    x = 1.234e8 *u.K/u.m
+    mprint(x)
