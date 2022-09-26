@@ -97,3 +97,7 @@ def print_eq(lhs, x, d=3, op='='):
         string = '${0:0.{3}f}$ {1:{4}}'.format(fac, unit, exp, d, fmt)
     display(Latex('$'+lhs+op+'\:$'+string))
     return None 
+
+def round_up(n, decimals=0):
+    multiplier = 10 ** decimals
+    return math.ceil(n * multiplier) / multiplier
