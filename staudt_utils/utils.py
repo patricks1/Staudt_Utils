@@ -1,7 +1,7 @@
+import math
 import numpy as np
 from astropy import units as u
 from IPython.display import display, Latex
-from math import floor
 
 def lookup(lookupval,lookuparray,resultarray,threshold):
     #defining a lookup function that assumes lookuparray is sorted in ascending 
@@ -58,7 +58,7 @@ def mprint(x, d=3, show=True):
         x = u.quantity.Quantity(x)
     v=x.value
 
-    exp = int(floor(np.log10((abs(v)))))
+    exp = int(math.floor(np.log10((abs(v)))))
     if exp != 0:
         order_string = '\\times10^{{{0:d}}}'.format(exp)
     else:
@@ -93,7 +93,7 @@ def print_eq_old(lhs, x, d=3, op='='):
         v=x
         unit=''
         fmt='s'
-    exp = int(floor(np.log10(abs(v))))
+    exp = int(math.floor(np.log10(abs(v))))
     fac = v/10.**exp #factor
     if exp!=0:
         string = '${0:0.{3}f}\\times10^{{{2}}}$ {1:{4}}'.format(fac, unit, exp, d, fmt)
@@ -111,7 +111,7 @@ def print_eq(lhs, x, d=3, op='='):
         v=x
         unit=''
         fmt='s'
-    exp = int(floor(np.log10(abs(v))))
+    exp = int(math.floor(np.log10(abs(v))))
     fac = v/10.**exp #factor
     if exp!=0:
         string = '${0:0.{3}f}\\times10^{{{2}}}$ {1:{4}}'.format(fac, unit, exp, d, fmt)
