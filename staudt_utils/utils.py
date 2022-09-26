@@ -54,10 +54,32 @@ def lookup(lookupval,lookuparray,resultarray,threshold):
     return result
 
 def mprint(x, d=3, show=True):
+    if not isinstance(x,u.quantity.Quantity):
+        x = u.quantity.Quantity(x)
     v=x.value
+
     exp = int(floor(np.log10((abs(v)))))
+    if exp != 0:
+        order_string = '\\times10^{{{0:d}}}'.format(exp)
+    else:
+        order_string = ''
+
     fac = v/10.**exp
-    string = '${0:0.{3}f}\\times10^{{{2}}}$ {1:latex}'.format(fac, x.unit, exp, d)
+    unit_string = '{0:latex}'.format(x.unit)
+
+    #replace '$' so unit_string can be easily incorporated into the larger 
+    #string
+    unit_string = unit_string.replace('$','') 
+    
+    #if x is not unitless, add a space before the unit, otherwise just get rid
+    #of the string
+    if unit_string!='\mathrm{}': 
+        unit_string = '\ '+unit_string
+    else:
+        unit_string = ''
+
+    string = '${0:0.{3}f}{2:s}{1:s}$'.format(fac, unit_string, 
+                                             order_string, d)
     if show:
         display(Latex(string))
     return string 
@@ -101,3 +123,7 @@ def print_eq(lhs, x, d=3, op='='):
 def round_up(n, decimals=0):
     multiplier = 10 ** decimals
     return math.ceil(n * multiplier) / multiplier
+
+if __name__=='__main__':
+    x = 1.234e8 *u.K/u.m
+    mprint(x)
