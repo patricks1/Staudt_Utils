@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import collections.abc
 from astropy import units as u
 from IPython.display import display, Latex
 
@@ -96,7 +97,8 @@ def print_eq_old(lhs, x, d=3, op='='):
     exp = int(math.floor(np.log10(abs(v))))
     fac = v/10.**exp #factor
     if exp!=0:
-        string = '${0:0.{3}f}\\times10^{{{2}}}$ {1:{4}}'.format(fac, unit, exp, d, fmt)
+        string = '${0:0.{3}f}\\times10^{{{2}}}$ {1:{4}}'.format(fac, unit, exp, 
+                                                                d, fmt)
     else:
         string = '${0:0.{3}f}$ {1:{4}}'.format(fac, unit, exp, d, fmt)
     display(Latex('{0} ${2}$ {1}'.format(lhs,string,op)))
@@ -114,7 +116,8 @@ def print_eq(lhs, x, d=3, op='='):
     exp = int(math.floor(np.log10(abs(v))))
     fac = v/10.**exp #factor
     if exp!=0:
-        string = '${0:0.{3}f}\\times10^{{{2}}}$ {1:{4}}'.format(fac, unit, exp, d, fmt)
+        string = '${0:0.{3}f}\\times10^{{{2}}}$ {1:{4}}'.format(fac, unit, exp, 
+                                                                d, fmt)
     else:
         string = '${0:0.{3}f}$ {1:{4}}'.format(fac, unit, exp, d, fmt)
     display(Latex('$'+lhs+op+'\:$'+string))
@@ -123,6 +126,61 @@ def print_eq(lhs, x, d=3, op='='):
 def round_up(n, decimals=0):
     multiplier = 10 ** decimals
     return math.ceil(n * multiplier) / multiplier
+
+def determine_er_symmetry(y, maxy, miny):
+    dy_plus = maxy-y
+    dy_minus = y-miny
+    exp_plus = int(math.floor(np.log10(abs(dy_plus))))
+    exp_minus = int(math.floor(np.log10(abs(dy_minus))))
+
+    if exp_plus == exp_minus:
+        fac_plus = dy_plus/10.**exp_plus
+        fac_minus = dy_minus/10.**exp_minus
+        if round(fac_plus) == round(fac_minus):
+            return np.array([y, np.mean([dy_plus, dy_minus])])
+    return np.array([y, dy_plus, dy_minus])
+
+def log2linear(logy, dlogy):
+    y = 10.**logy
+    minlogy = logy-dlogy
+    maxlogy = logy+dlogy 
+    miny = 10.**minlogy
+    maxy = 10.**maxlogy
+    return determine_er_symmetry(y, maxy, miny)
+
+def linear2log(y, dy):
+    logy = np.log10(y)
+    maxy = y+dy
+    miny = y-dy
+    maxlogy = np.log10(maxy)
+    minlogy = np.log10(miny)
+    return determine_er_symmetry(logy, maxlogy, minlogy)
+
+def sig_figs(y, dys):
+    def formatter(x, decimals):
+        x = round(x, decimals)
+        fmt_str = '{{0:0.{0:d}f}}'.format(max(0,decimals))
+        return fmt_str.format(x)
+
+    dys = dys.copy()
+    if not isinstance(dys, (collections.abc.Sequence, np.ndarray)):
+        dys = np.array([dys])
+    assert len(dys)<=2
+    decimalss = []
+    dy_strings = []
+    for dy in dys:
+        exp = int(math.floor(np.log10(abs(dy))))
+        fac = dy/10.**exp
+        if round(fac,0) == 1:
+            exp -= 1
+        decimals = -exp
+        decimalss += [decimals]
+        dy = formatter(dy, decimals)
+        dy_strings += [dy]
+    #decimalss = np.array(decimalss)
+    #dys = np.array([round(dy,decimals) for dy,decimals in zip(dys,decimalss)])
+    dy_strings = np.array(dy_strings)
+    return formatter(y,max(decimalss)), dy_strings
 
 if __name__=='__main__':
     x = 1.234e8 *u.K/u.m
