@@ -161,17 +161,18 @@ def sig_figs(y, dys):
         x = round(x, decimals)
         fmt_str = '{{0:0.{0:d}f}}'.format(max(0,decimals))
         return fmt_str.format(x)
-
-    dys = dys.copy()
-    if not isinstance(dys, (collections.abc.Sequence, np.ndarray)):
-        dys = np.array([dys])
+    
+    # The following line serves to both work with a copy of dys so we don't
+    # modify the original and to make dys into an np.ndarray if it's not
+    # already.
+    dys = np.array([dys])
     assert len(dys)<=2
     decimalss = []
     dy_strings = []
     for dy in dys:
         exp = int(math.floor(np.log10(abs(dy))))
         fac = dy/10.**exp
-        if round(fac,0) == 1:
+        if str(fac)[0] == '1':
             exp -= 1
         decimals = -exp
         decimalss += [decimals]
