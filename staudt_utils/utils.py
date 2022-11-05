@@ -162,10 +162,13 @@ def sig_figs(y, dys):
         fmt_str = '{{0:0.{0:d}f}}'.format(max(0,decimals))
         return fmt_str.format(x)
     
-    # The following line serves to both work with a copy of dys so we don't
+    # The following serves to both work with a copy of dys so we don't
     # modify the original and to make dys into an np.ndarray if it's not
     # already.
-    dys = np.array([dys])
+    if not isinstance(dys, (np.ndarray, list, tuple)):
+        dys = np.array([dys])
+    else:
+        dys = np.array(dys)
     assert len(dys)<=2
     decimalss = []
     dy_strings = []
