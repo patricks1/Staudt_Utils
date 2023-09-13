@@ -5,13 +5,15 @@ from astropy import units as u
 from IPython.display import display, Latex
 
 def lookup(lookupval,lookuparray,resultarray,threshold):
-    #defining a lookup function that assumes lookuparray is sorted in ascending 
-    #order
+    '''
+    Defining a lookup function that assumes lookuparray is sorted in ascending 
+    order
     
-    #**threshold is the maximum difference between the lookupval and the value
-    #found in the lookup aray in order for the function to return a result. For
-    #example, in abundance matching, we would typically set threshold to the
-    #average step in numden.
+    **threshold is the maximum difference between the lookupval and the value
+    found in the lookup aray in order for the function to return a result. For
+    example, in abundance matching, we would typically set threshold to the
+    average step in numden.
+    '''
     
     lookuparval,i=float('-inf'),0
     #while the values in the lookup array are less than the lookup value:  
@@ -105,6 +107,24 @@ def print_eq_old(lhs, x, d=3, op='='):
     return None 
 
 def print_eq(lhs, x, d=3, op='='):
+    '''
+    Display a LaTeX equation
+
+    Parameters
+    ----------
+    lhs: str
+        Left hand side of the equation, in LaTeX format but with no $'s
+    x: float
+        Value to display on right-hand side of the equation
+    d: int
+        Number of decimals to display
+    op: str
+        Operator to put between lhs and rhs
+
+    Return
+    ------
+    None
+    '''
     if type(x)==u.quantity.Quantity:
         v=x.value
         unit=x.unit
@@ -130,15 +150,13 @@ def round_up(n, decimals=0):
 def determine_er_symmetry(y, maxy, miny):
     dy_plus = maxy-y
     dy_minus = y-miny
-    exp_plus = int(math.floor(np.log10(abs(dy_plus))))
-    exp_minus = int(math.floor(np.log10(abs(dy_minus))))
 
-    if exp_plus == exp_minus:
-        fac_plus = dy_plus/10.**exp_plus
-        fac_minus = dy_minus/10.**exp_minus
-        if round(fac_plus) == round(fac_minus):
-            return np.array([y, np.mean([dy_plus, dy_minus])])
-    return np.array([y, dy_plus, dy_minus])
+    _, dys = sig_figs(y, [dy_plus, dy_minus])     
+
+    if dys[0] == dys[1]:
+        return np.array([y, np.mean([dy_plus, dy_minus])])
+    else:
+        return np.array([y, dy_plus, dy_minus])
 
 def log2linear(logy, dlogy):
     y = 10.**logy
@@ -157,6 +175,30 @@ def linear2log(y, dy):
     return determine_er_symmetry(logy, maxlogy, minlogy)
 
 def sig_figs(y, dys):
+    '''
+    Determine how many decimal places to show for a value given its 
+    uncertainty.
+
+    Parameters
+    ----------
+    y: float 
+	The value of the variable
+    dy: float or array-like 
+	The uncertainty in the variable. If a float is given, the uncertainty
+	is assumed to be symmetric. If an array/list is given, the 0 element
+	should be the +uncertainty, the 1 element the -uncertainty.
+        The galaxy name string corresponding to an index in df.
+
+    Returns
+    -------
+    y_string: str
+        A string representing the properly rounded target variable
+    dy_strings: np.ndarray
+        An array of uncertainty in y. If len(dy_strings)==1, the uncertainty
+	is symmetrical. If len(dy_strings)==2, the 0 element is the 
+	+uncertainty, the 1 element the -uncertainty.
+    ''' 
+
     def formatter(x, decimals):
         x = round(x, decimals)
         fmt_str = '{{0:0.{0:d}f}}'.format(max(0,decimals))
@@ -175,7 +217,9 @@ def sig_figs(y, dys):
     for dy in dys:
         exp = int(math.floor(np.log10(abs(dy))))
         fac = dy/10.**exp
-        if str(fac)[0] == '1':
+        if str(round(fac, 1))[0] == '1':
+            # If the uncertainty would have a '1' as its first digit when we
+            # show one decimal... then show one decimal. 
             exp -= 1
         decimals = -exp
         decimalss += [decimals]
