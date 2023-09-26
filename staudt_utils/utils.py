@@ -148,6 +148,14 @@ def round_up(n, decimals=0):
     return math.ceil(n * multiplier) / multiplier
 
 def determine_er_symmetry(y, maxy, miny):
+    '''
+    Returns
+    -------
+    if errors are asymmetric:
+        np.array([y, dy_plus, dy_minus]) 
+    if errors are symmetric:
+        np.array([y, dy]) 
+    '''
     dy_plus = maxy-y
     dy_minus = y-miny
 
@@ -159,6 +167,12 @@ def determine_er_symmetry(y, maxy, miny):
         return np.array([y, dy_plus, dy_minus])
 
 def log2linear(logy, dlogy):
+    '''
+    Returns
+    -------
+    np.array([y, *dy]), shape=(2,) if linear errors are symmetric
+                              (3,) if linear errors are asymmetric
+    '''
     y = 10.**logy
     minlogy = logy-dlogy
     maxlogy = logy+dlogy 
@@ -167,6 +181,12 @@ def log2linear(logy, dlogy):
     return determine_er_symmetry(y, maxy, miny)
 
 def linear2log(y, dy):
+    '''
+    Returns
+    -------
+    np.array([logy, *dlogy]), shape=(2,) if log-space errors are symmetric
+                                    (3,) if log-space errors are asymmetric
+    '''
     logy = np.log10(y)
     maxy = y+dy
     miny = y-dy
