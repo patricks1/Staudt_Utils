@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from distutils.core import setup
-
-__version__ = '0.4.0'
+from staudt_utils import __version__
 
 setup(name = 'staudt_utils',
       version = __version__,
