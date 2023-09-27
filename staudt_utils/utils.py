@@ -219,6 +219,11 @@ def sig_figs(y, dys):
 	+uncertainty, the 1 element the -uncertainty.
     ''' 
 
+    if not isinstance(y, (int, float)):
+        raise ValueError('y should be a float or int but is a {0}. Perhaps you'
+                         ' accidentally passed an element of a target vector'
+                         ' instead of that element\'s value.'.format(type(y)))
+
     def formatter(x, decimals):
         x = round(x, decimals)
         fmt_str = '{{0:0.{0:d}f}}'.format(max(0,decimals))
