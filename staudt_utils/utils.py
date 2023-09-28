@@ -166,7 +166,7 @@ def determine_er_symmetry(y, maxy, miny):
     else:
         return np.array([y, dy_plus, dy_minus])
 
-def log2linear(logy, dlogy):
+def log2linear(logy, dlogy, check_symmetry=True):
     '''
     Returns
     -------
@@ -178,9 +178,14 @@ def log2linear(logy, dlogy):
     maxlogy = logy+dlogy 
     miny = 10.**minlogy
     maxy = 10.**maxlogy
-    return determine_er_symmetry(y, maxy, miny)
+    if check_symmetry:
+        return determine_er_symmetry(y, maxy, miny)
+    else:
+        dy_plus = maxy - y
+        dy_minus = y - miny
+        return np.array([y, dy_plus, dy_minus])
 
-def linear2log(y, dy):
+def linear2log(y, dy, check_symmetry=True):
     '''
     Returns
     -------
@@ -192,7 +197,12 @@ def linear2log(y, dy):
     miny = y-dy
     maxlogy = np.log10(maxy)
     minlogy = np.log10(miny)
-    return determine_er_symmetry(logy, maxlogy, minlogy)
+    if check_symmetry:
+        return determine_er_symmetry(logy, maxlogy, minlogy)
+    else:
+        dlogy_plus = maxlogy - logy
+        dlogy_minus = logy - minlogy
+        return np.array([logy, dlogy_plus, dlogy_minus])
 
 def sig_figs(y, dys):
     '''
@@ -250,9 +260,10 @@ def sig_figs(y, dys):
         decimalss += [decimals]
         dy = formatter(dy, decimals)
         dy_strings += [dy]
-    #decimalss = np.array(decimalss)
-    #dys = np.array([round(dy,decimals) for dy,decimals in zip(dys,decimalss)])
     dy_strings = np.array(dy_strings)
+    if len(dy_strings) > 1 and dy_strings[0] == dy_strings[1]:
+        # If the uncertainties are symmetric, get rid of one of them
+        dy_strings = np.array([dy_strings[0]])
     return formatter(y,max(decimalss)), dy_strings
 
 if __name__=='__main__':
