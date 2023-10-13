@@ -161,7 +161,9 @@ def determine_er_symmetry(y, maxy, miny):
 
     _, dys = sig_figs(y, [dy_plus, dy_minus])     
 
-    if dys[0] == dys[1]:
+    if len(dys) == 1:
+        # If sig_figs found the errors to be approximately symmetric, use
+        # the mean of the +error and the -error for `dy`.
         return np.array([y, np.mean([dy_plus, dy_minus])])
     else:
         return np.array([y, dy_plus, dy_minus])
@@ -213,7 +215,7 @@ def sig_figs(y, dys):
     ----------
     y: float 
 	The value of the variable
-    dy: float or array-like 
+    dys: float or array-like 
 	The uncertainty in the variable. If a float is given, the uncertainty
 	is assumed to be symmetric. If an array/list is given, the 0 element
 	should be the +uncertainty, the 1 element the -uncertainty.
