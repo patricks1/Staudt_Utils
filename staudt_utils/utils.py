@@ -174,6 +174,7 @@ def log2linear(logy, dlogy, check_symmetry=True):
     -------
     np.array([y, *dy]), shape=(2,) if linear errors are symmetric
                               (3,) if linear errors are asymmetric
+        If asymmetric, dy[0] is the plus error; dy[1] is the minus error.
     '''
     y = 10.**logy
     minlogy = logy-dlogy
@@ -193,6 +194,7 @@ def linear2log(y, dy, check_symmetry=True):
     -------
     np.array([logy, *dlogy]), shape=(2,) if log-space errors are symmetric
                                     (3,) if log-space errors are asymmetric
+        If asymmetric, dy[0] is the plus error; dy[1] is the minus error.
     '''
     logy = np.log10(y)
     maxy = y+dy
