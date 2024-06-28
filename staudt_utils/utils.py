@@ -56,12 +56,37 @@ def lookup(lookupval,lookuparray,resultarray,threshold):
     
     return result
 
-def mprint(x, d=3, show=True):
+def mprint(x, d=3, show=True, order_of_mag=None):
+    '''
+    Generate a LaTeX formatted version of data in scientific notation
+
+    Parameters
+    ----------
+    x: float
+        The data point to be formatted.
+    d: int, default 3
+        The number of decimal places to show.
+    show: bool, default True
+        Whether to display the result or just return it.
+    order_of_mag: int, default None
+        An order of magnitude nto which the user can force the scientific
+        notation. If not specified, the method determines it automatically so
+        there is only one leading digit before the decimal.
+
+    Returns
+    -------
+    string: str
+        The LaTeX formatted data point in scientific notation, enclosed in '$' 
+        characters.
+    '''
     if not isinstance(x,u.quantity.Quantity):
         x = u.quantity.Quantity(x)
     v=x.value
 
-    exp = int(math.floor(np.log10((abs(v)))))
+    if order_of_mag is not None:
+        exp = order_of_mag
+    else:
+        exp = int(math.floor(np.log10((abs(v)))))
     if exp != 0:
         order_string = '\\times10^{{{0:d}}}'.format(exp)
     else:
